@@ -34,13 +34,14 @@ namespace AnimatedCalculator
 
         public void NumberBtns_Click(object sender, RoutedEventArgs e)
         {
-            string btn = (sender as System.Windows.Controls.Button).Content.ToString();
-            if (isInitialInput || resultTxt.Text == "0")
+            string numberKind = number.Kind.ToString();
+            int numberKindSize = numberKind.Length;
+            if (resultTxt.Text == "0" || isInitialInput)
             {
-                resultTxt=null;
+                resultTxt.Text = String.Empty;
                 isInitialInput = false;
             }
-            resultTxt.Text = btn;
+            resultTxt.Text = (numberKind[numberKindSize - 1]).ToString();
             operationBtnClicked = false;
         }
 
@@ -124,13 +125,21 @@ namespace AnimatedCalculator
 
         public void DecBtn_Click(object sender, RoutedEventArgs e)
         {
-
+            if (resultTxt.Text.Contains("."))
+                return;
+            if (isInitialInput)
+            {
+                resultTxt.Text = "0.";
+                isInitialInput = false;
+                return;
+            }
+            resultTxt.Text += ".";
         }
 
         public void ClearBtn_Click(object sender, RoutedEventArgs e)
         {
             resultTxt.Text = "0";
-            calculationsTxt.Text = null;
+            calculationsTxt.Text = String.Empty;
             firstNumber = null;
             secondNumber = null;
             operation = '\0';
