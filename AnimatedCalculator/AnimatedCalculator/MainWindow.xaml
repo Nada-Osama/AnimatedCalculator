@@ -161,7 +161,7 @@
                     <Button Grid.Column="3" Grid.Row="3" Margin="5" Click="OperationBtns_Click"
                             Style="{StaticResource MaterialDesignFloatingActionButton}"
                             BorderThickness="1" BorderBrush="{StaticResource PrimaryHueMidBrush}">
-                        <materialDesign:PackIcon Kind="Plus" Width="30" Height="30"/>
+                        <materialDesign:PackIcon Kind="Add" Width="30" Height="30"/>
                     </Button>
 
                     <Button x:Name="ButtonPowerOff" Grid.Column="0" Grid.Row="4" Margin="5"

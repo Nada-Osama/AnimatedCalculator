@@ -43,7 +43,10 @@ namespace AnimatedCalculator
                 resultTxt.Text = String.Empty;
                 isInitialInput = false;
             }
-            resultTxt.Text += (numberKind[numberKindSize - 1]).ToString();
+            if ((numberKind[numberKindSize - 1]).ToString() == "o")
+                resultTxt.Text += "2";
+            else
+                resultTxt.Text += (numberKind[numberKindSize - 1]).ToString();
 
             //to prevent display resultTxt text in calculationTxt when first entry of number
             if (isInitialInput)
@@ -56,7 +59,7 @@ namespace AnimatedCalculator
         {
             switch (operation)
             {
-                case "Plus":
+                case "Add":
                     {
                         result = firstNumber + secondNumber;
                     }
@@ -79,6 +82,11 @@ namespace AnimatedCalculator
                     catch
                     {
                         MessageBox.Show("Can't divide by zero!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    break;
+                case "Percent":
+                    {
+                        result = firstNumber * secondNumber / 100;
                     }
                     break;
             }
@@ -131,7 +139,7 @@ namespace AnimatedCalculator
         {
             switch (operation)
             {
-                case "Plus":
+                case "Add":
                     operationSymbol = '+';
                     break;
                 case "Minus":
@@ -213,8 +221,14 @@ namespace AnimatedCalculator
                 resultTxt.Text = "0";
                 calculationsTxt.Text = "0";
             }
-            //calculationsTxt.Text = String.Empty;
-            decimal PercentedNumber = decimal.Parse(resultTxt.Text) / 100;
+
+            string number1 = null;
+            for (int i = 0; i < calculationsTxt.Text.Length - 1; ++i)
+            {
+                number1 += calculationsTxt.Text[i].ToString();
+            }
+            decimal PercentedNumber = decimal.Parse(number1) * decimal.Parse(resultTxt.Text) / 100;
+
             resultTxt.Text = PercentedNumber.ToString();
             calculationsTxt.Text += resultTxt.Text; 
             isInitialInput = false;
