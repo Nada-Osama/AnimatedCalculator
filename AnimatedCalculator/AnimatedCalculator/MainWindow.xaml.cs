@@ -21,12 +21,14 @@ namespace AnimatedCalculator
     public partial class MainWindow : Window
     {
         decimal? firstNumber = null, secondNumber = null, result = null;
-        char operation;
+        char operationSymbol;
+        String operation;
         /// <summary>
         /// <para isOperationDone> returns false when secondNumber isn't entered yet </para>
         /// <para operationBtnClicked> to prevent consecutive operationBtn clicking without secondNumber entry </para>
         /// </summary>
-        Boolean isInitialInput = true, isOperationDone = false, operationBtnClicked = false;
+        Boolean isInitialInput = true, isOperationDone = false, operationBtnClicked = false,
+            isPlusMinus_Or_Percent_BtnsClicked = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -34,14 +36,20 @@ namespace AnimatedCalculator
 
         public void NumberBtns_Click(object sender, RoutedEventArgs e)
         {
-            string numberKind = number.Kind.ToString();
+            Button btn = (Button)sender;
+            string numberKind = ((MaterialDesignThemes.Wpf.PackIcon)(btn.Content)).Kind.ToString();
             int numberKindSize = numberKind.Length;
             if (resultTxt.Text == "0" || isInitialInput)
             {
                 resultTxt.Text = String.Empty;
                 isInitialInput = false;
             }
-            resultTxt.Text = (numberKind[numberKindSize - 1]).ToString();
+            resultTxt.Text += (numberKind[numberKindSize - 1]).ToString();
+
+            //to prevent display resultTxt text in calculationTxt when first entry of number
+            if (isInitialInput)
+                calculationsTxt.Text += resultTxt.Text; 
+
             operationBtnClicked = false;
         }
 
@@ -49,16 +57,22 @@ namespace AnimatedCalculator
         {
             switch (operation)
             {
-                case '+':
-                    result = firstNumber + secondNumber;
+                case "Plus":
+                    {
+                        result = firstNumber + secondNumber;
+                    }
                     break;
-                case '-':
-                    result = firstNumber - secondNumber;
+                case "Minus":
+                    {
+                        result = firstNumber - secondNumber;
+                    }
                     break;
-                case '*':
-                    result = firstNumber * secondNumber;
+                case "Multiplication":
+                    {
+                        result = firstNumber * secondNumber;
+                    }
                     break;
-                case '/':
+                case "Division":
                     try
                     {
                         result = firstNumber / secondNumber;
@@ -68,22 +82,17 @@ namespace AnimatedCalculator
                         MessageBox.Show("Can't divide by zero!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                     break;
-                case '%':
-                    secondNumber /= 100;
-                    break;
-                case '±':
-                    secondNumber *= (-1);
-                    break;
             }
         }
 
         public void OperationBtns_Click(object sender, RoutedEventArgs e)
         {
-            string btn = (sender as System.Windows.Controls.Button).Content.ToString();
+            Button btn = (Button)sender;
+            string operationKind = ((MaterialDesignThemes.Wpf.PackIcon)(btn.Content)).Kind.ToString();
             isInitialInput = true;
             if (operationBtnClicked)
             {
-                operation = char.Parse(btn);
+                operation = operationKind;
                 return;
             }
             if (isOperationDone)
@@ -94,16 +103,49 @@ namespace AnimatedCalculator
                 }
                 secondNumber = decimal.Parse(resultTxt.Text);
                 Do_Operation();
-                operation = char.Parse(btn);
+                operation = operationKind;
+                if (!isPlusMinus_Or_Percent_BtnsClicked)
+                    calculationsTxt.Text += resultTxt.Text;
                 resultTxt.Text = result.ToString();
+
+                OperationSymbolPrint();
+                calculationsTxt.Text += operationSymbol.ToString();
             }
             else
             {
                 firstNumber = decimal.Parse(resultTxt.Text);
-                operation = char.Parse(btn);
+                operation = operationKind;
+
+                //to display number beside operation sign when first input
+                if (isInitialInput)
+                    calculationsTxt.Text += resultTxt.Text;
+
+                //to print opteration sign in calculationTxt when clicked
+                OperationSymbolPrint();
+                calculationsTxt.Text += operationSymbol.ToString();
+
                 isOperationDone = true;
             }
             operationBtnClicked = true;
+        }
+
+        private void OperationSymbolPrint()
+        {
+            switch (operation)
+            {
+                case "Plus":
+                    operationSymbol = '+';
+                    break;
+                case "Minus":
+                    operationSymbol = '-';
+                    break;
+                case "Multiplication":
+                    operationSymbol = '*';
+                    break;
+                case "Division":
+                     operationSymbol = '÷';
+                    break;
+            }
         }
 
         public void EqualBtn_Click(object sender, RoutedEventArgs e)
@@ -113,27 +155,37 @@ namespace AnimatedCalculator
             secondNumber = decimal.Parse(resultTxt.Text);
             Do_Operation();
             if (result != null)
+            {
+                /// <summary>
+                /// <para last> gets last number before equalClick to display it in historyTxt </para>
+                /// </summary>
+                string last = resultTxt.Text;
                 resultTxt.Text = result.ToString();
+                historyTxt.Text = calculationsTxt.Text + last + " = " + resultTxt.Text;
+            }
             //to start from the beginning
             firstNumber = null;
             secondNumber = null;
-            operation = '\0';
+            operation = null;
             isInitialInput = true;
             operationBtnClicked = false;
             isOperationDone = false;
+            calculationsTxt.Text = String.Empty;
         }
 
         public void DecBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (resultTxt.Text.Contains("."))
-                return;
+            Button btn = (Button)sender;
             if (isInitialInput)
             {
-                resultTxt.Text = "0.";
                 isInitialInput = false;
+                resultTxt.Text = "0.";
                 return;
             }
-            resultTxt.Text += ".";
+            if (resultTxt.Text.Contains("."))
+                return;
+            isInitialInput = false;
+            resultTxt.Text += btn.Content;
         }
 
         public void ClearBtn_Click(object sender, RoutedEventArgs e)
@@ -142,12 +194,34 @@ namespace AnimatedCalculator
             calculationsTxt.Text = String.Empty;
             firstNumber = null;
             secondNumber = null;
-            operation = '\0';
+            operation = null;
             isInitialInput = true;
             operationBtnClicked = false;
             isOperationDone = false;
         }
 
+        public void PlusMinusBtn_Click(object sender, RoutedEventArgs e)
+        {
+            decimal negateNumber = decimal.Parse(resultTxt.Text) * -1;
+            resultTxt.Text = negateNumber.ToString();
+            //calculationsTxt.Text += resultTxt.Text;
+            isInitialInput = false;
+            isPlusMinus_Or_Percent_BtnsClicked = true;
+        }
 
+        public void PercentBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (isInitialInput || !isOperationDone)
+            {
+                resultTxt.Text = "0";
+                calculationsTxt.Text = "0";
+            }
+            //calculationsTxt.Text = String.Empty;
+            decimal PercentedNumber = decimal.Parse(resultTxt.Text) / 100;
+            resultTxt.Text = PercentedNumber.ToString();
+            calculationsTxt.Text += resultTxt.Text; 
+            isInitialInput = false;
+            isPlusMinus_Or_Percent_BtnsClicked = true;
+        }
     }
 }
