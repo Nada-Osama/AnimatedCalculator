@@ -27,8 +27,7 @@ namespace AnimatedCalculator
         /// <para isOperationDone> returns false when secondNumber isn't entered yet </para>
         /// <para operationBtnClicked> to prevent consecutive operationBtn clicking without secondNumber entry </para>
         /// </summary>
-        Boolean isInitialInput = true, isOperationDone = false, operationBtnClicked = false,
-            isPlusMinus_Or_Percent_BtnsClicked = false;
+        Boolean isInitialInput = true, isOperationDone = false, operationBtnClicked = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -104,8 +103,7 @@ namespace AnimatedCalculator
                 secondNumber = decimal.Parse(resultTxt.Text);
                 Do_Operation();
                 operation = operationKind;
-                if (!isPlusMinus_Or_Percent_BtnsClicked)
-                    calculationsTxt.Text += resultTxt.Text;
+                calculationsTxt.Text += resultTxt.Text;
                 resultTxt.Text = result.ToString();
 
                 OperationSymbolPrint();
@@ -206,7 +204,6 @@ namespace AnimatedCalculator
             resultTxt.Text = negateNumber.ToString();
             //calculationsTxt.Text += resultTxt.Text;
             isInitialInput = false;
-            isPlusMinus_Or_Percent_BtnsClicked = true;
         }
 
         public void PercentBtn_Click(object sender, RoutedEventArgs e)
@@ -221,7 +218,6 @@ namespace AnimatedCalculator
             resultTxt.Text = PercentedNumber.ToString();
             calculationsTxt.Text += resultTxt.Text; 
             isInitialInput = false;
-            isPlusMinus_Or_Percent_BtnsClicked = true;
         }
     }
 }
